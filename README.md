@@ -4,13 +4,9 @@
 
 **Master's Thesis Project — Instituto Superior Técnico (IST), Universidade de Lisboa**
 
-[![Project Page](https://img.shields.io/badge/Website-filipetendeiro.github.io%2FFireTools-ff6b35)](https://filipetendeiro.github.io/FireTools/)
-
-</div>
-
 <div align="center">
 
-[![Watch overview video](https://img.shields.io/badge/▶_Watch_overview_video-Project_website-8c42f5?style=for-the-badge)](https://filipetendeiro.github.io/FireTools/)
+[![Project Website](https://img.shields.io/badge/Project_website-8c42f5?style=for-the-badge)](https://filipetendeiro.github.io/FireTools/)
 
 <img src="images/FireTools_overview.png" width="90%" alt="FireTools system overview">
 
