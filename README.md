@@ -1,4 +1,4 @@
-# FireTools: Enhancing Wildfire Response Through Integrated Detection and Segmentation Tools
+# FireTools: Integrated Tools for Enhanced Wildfire Detection and Segmentation
 
 <div align="center">
 
