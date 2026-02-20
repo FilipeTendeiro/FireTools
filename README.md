@@ -9,7 +9,11 @@
 </div>
 
 <div align="center">
-  <video src="https://raw.githubusercontent.com/FilipeTendeiro/FireTools/main/images/FireTools.mp4" controls width="90%" style="max-width:900px; border-radius:12px;">FireTools system overview</video>
+
+[![Watch overview video](https://img.shields.io/badge/▶_Watch_overview_video-Project_website-8c42f5?style=for-the-badge)](https://filipetendeiro.github.io/FireTools/)
+
+<img src="images/FireTools_overview.png" width="90%" alt="FireTools system overview">
+
 </div>
 
 ---
