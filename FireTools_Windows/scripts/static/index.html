@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FireTools Detection Platform</title>
+    <!-- Cache-busting meta tags -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/static/css/common.css">
+    <style>
+        /* Task status styles */
+        .task-status {
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        .status-queued { background-color: #6c757d; }
+        .status-uploading { background-color: #17a2b8; }
+        .status-processing { background-color: #ffc107; color: #212529; }
+        .status-downloading, .status-finishing { background-color: #17a2b8; }
+        .status-completed { background-color: #28a745; }
+        .status-failed { background-color: #dc3545; }
+        
+        /* Notification system styles */
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            max-width: 400px;
+        }
+        
+        .notification {
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            animation: slideIn 0.3s ease-out;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .notification.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .notification.info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .notification.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .notification-content {
+            flex: 1;
+            margin-right: 10px;
+        }
+        
+        .notification-button {
+            background: none;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+        
+        .notification.success .notification-button {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .notification.success .notification-button:hover {
+            background-color: #218838;
+        }
+        
+        .notification-close {
+            background: none;
+            border: none;
+            font-size: 1.2em;
+            cursor: pointer;
+            opacity: 0.7;
+            margin-left: 10px;
+        }
+        
+        .notification-close:hover {
+            opacity: 1;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Notification Container -->
+    <div class="notification-container" id="notificationContainer"></div>
+    
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">FireTools</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="index.html">Upload</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="detection-gallery.html">Detection Gallery</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="segmentation-gallery.html">Segmentation Gallery</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="frames-gallery.html">Frames Gallery</a>
+                    </li>
+                </ul>
+                <button id="theme-toggle" class="btn btn-outline-primary">
+                    <i class="bi bi-sun-fill"></i> Light Mode
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="header mt-4">FireTools Platform</h1>
+        <p class="subtitle">Leveraging AI for Early Wildfire Detection & Segmentation</p>
+
+        <div class="row">
+            <div class="col-lg-10 offset-lg-1">
+                <div id="upload" class="card">
+                    <h2>Fire Detection</h2>
+                    <p>Upload images or videos and our AI will detect and analyze fires automatically.</p>
+                    
+                    <form id="upload-form" class="mb-4">
+                        <div class="mb-3">
+                            <label for="files" class="form-label">Select image(s) or video(s)</label>
+                            <input class="form-control" type="file" id="files" multiple accept="image/jpeg,image/png,video/mp4,video/avi">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Upload and Run Detection</button>
+                    </form>
+
+                    <div id="tasks-container" class="d-none">
+                        <h5>Processing Tasks</h5>
+                        <div id="tasks-list" class="list-group mb-3"></div>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <p>Once processing is complete, view your results in the:</p>
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="detection-gallery.html" class="btn btn-primary">Detection Gallery</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Latest Results Section -->
+                <div id="latest-results" class="card mt-4 d-none">
+                    <h2>Current Session Results</h2>
+                    <div id="latest-results-content" class="row">
+                        <!-- Content will be dynamically populated -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>© 2025 FireTools Research Project · Instituto Superior Técnico</p>
+        </div>
+    </footer>
+
+    <script src="/static/js/theme.js"></script>
+    <script src="/static/js/image-fullscreen.js"></script>
+    <script src="/static/js/video-sync-loader.js"></script>
+    <script>
+        // Notification system
+        function showNotification(message, type = 'info', buttonText = null, buttonAction = null) {
+            const container = document.getElementById('notificationContainer');
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            
+            const content = document.createElement('div');
+            content.className = 'notification-content';
+            content.textContent = message;
+            
+            notification.appendChild(content);
+            
+            if (buttonText && buttonAction) {
+                const button = document.createElement('button');
+                button.className = 'notification-button';
+                button.textContent = buttonText;
+                button.onclick = buttonAction;
+                notification.appendChild(button);
+            }
+            
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'notification-close';
+            closeBtn.innerHTML = '&times;';
+            closeBtn.onclick = () => notification.remove();
+            notification.appendChild(closeBtn);
+            
+            container.appendChild(notification);
+            
+            // Auto-remove after 10 seconds for non-success notifications
+            if (type !== 'success') {
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.remove();
+                    }
+                }, 10000);
+            }
+        }
+        
+        // Segmentation monitoring
+        let segmentationMonitors = new Map();
+        let shownNotifications = new Set(); // Track shown notifications to prevent duplicates
+        
+        function startSegmentationMonitoring(taskId, filename, buttonElement = null, mediaType = 'image') {
+            // Clear any existing monitor for this task
+            if (segmentationMonitors.has(taskId)) {
+                clearInterval(segmentationMonitors.get(taskId));
+            }
+            
+            const notificationKey = `${taskId}-${filename}`;
+            
+            const monitor = setInterval(async () => {
+                try {
+                    const response = await fetch(`${API_URL}/segmentation/status/${taskId}`);
+                    const data = await response.json();
+                    
+                    if (data.status === 'completed') {
+                        clearInterval(monitor);
+                        segmentationMonitors.delete(taskId);
+                        
+                        // Update button to "Already Segmented" state
+                        if (buttonElement) {
+                            buttonElement.disabled = true;
+                            buttonElement.classList.remove('btn-warning');
+                            buttonElement.classList.add('btn-secondary');
+                            buttonElement.innerHTML = `<i class="bi bi-check-circle"></i> ${mediaType === 'image' ? 'Image' : 'Video'} Already Segmented`;
+                        }
+                        
+                        // Only show notification if we haven't shown it before
+                        if (!shownNotifications.has(notificationKey)) {
+                            shownNotifications.add(notificationKey);
+                            showNotification(
+                                `Segmentation completed for ${filename}!`,
+                                'success',
+                                'View Results',
+                                () => window.location.href = 'segmentation-gallery.html'
+                            );
+                        }
+                    } else if (data.status === 'failed') {
+                        clearInterval(monitor);
+                        segmentationMonitors.delete(taskId);
+                        
+                        // Reset button on failure
+                        if (buttonElement) {
+                            buttonElement.disabled = false;
+                            buttonElement.classList.remove('btn-warning');
+                            buttonElement.classList.add('btn-success');
+                            buttonElement.innerHTML = '<i class="bi bi-palette"></i> Start Segmentation';
+                        }
+                        
+                        // Only show notification if we haven't shown it before
+                        if (!shownNotifications.has(notificationKey)) {
+                            shownNotifications.add(notificationKey);
+                            showNotification(
+                                `Segmentation failed for ${filename}: ${data.error || 'Unknown error'}`,
+                                'error'
+                            );
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error checking segmentation status:', error);
+                }
+            }, 5000); // Check every 5 seconds
+            
+            segmentationMonitors.set(taskId, monitor);
+        }
+        
+        // Initialize theme when DOM is loaded
+        window.addEventListener('DOMContentLoaded', () => {
+            initializeTheme();
+        });
+        
+        // API URL - change this to match your FastAPI server
+        const API_URL = window.location.origin;
+        
+        // Task tracking
+        let activeTasks = [];
+        
+        // DOM elements
+        const uploadForm = document.getElementById('upload-form');
+        const tasksContainer = document.getElementById('tasks-container');
+        const tasksList = document.getElementById('tasks-list');
+        
+        // Track processed files in the current session
+        let sessionProcessedFiles = [];
+        
+        // File upload handler
+        uploadForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const fileInput = document.getElementById('files');
+            if (fileInput.files.length === 0) {
+                alert('Please select at least one file');
+                return;
+            }
+            
+            const formData = new FormData();
+            for (const file of fileInput.files) {
+                formData.append('files', file);
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/upload/`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Upload failed');
+                }
+                
+                const data = await response.json();
+                activeTasks = [...activeTasks, ...data.tasks];
+                
+                // Show tasks container
+                tasksContainer.classList.remove('d-none');
+                
+                // Start polling for task status
+                updateTasksView();
+                startPolling();
+                
+                // Reset form
+                uploadForm.reset();
+                
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Upload failed: ' + error.message);
+            }
+        });
+        
+        // Task status polling
+        function startPolling() {
+            // Poll every 2 seconds
+            const intervalId = setInterval(() => {
+                const incompleteTasks = activeTasks.filter(
+                    task => task.status !== 'completed' && task.status !== 'failed'
+                );
+                
+                console.log('Polling tasks:', incompleteTasks.length, 'incomplete tasks');
+                
+                if (incompleteTasks.length === 0) {
+                    console.log('All tasks completed, stopping polling');
+                    clearInterval(intervalId);
+                    
+                    // Check if any tasks completed successfully
+                    const completedTasks = activeTasks.filter(task => task.status === 'completed');
+                    if (completedTasks.length > 0) {
+                        // Load the latest results for all completed tasks in this session
+                        loadSessionResults();
+                    }
+                    
+                    return;
+                }
+                
+                // Poll for updates on all incomplete tasks
+                incompleteTasks.forEach(async (task) => {
+                    try {
+                        console.log(`Polling task ${task.task_id}, current status: ${task.status}`);
+                        // Add timestamp to prevent caching
+                        const timestamp = new Date().getTime();
+                        const response = await fetch(`${API_URL}/task/${task.task_id}?_=${timestamp}`);
+                        if (response.ok) {
+                            const updatedTask = await response.json();
+                            console.log(`Got update for task ${task.task_id}:`, updatedTask);
+                            
+                            // Validate response format
+                            if (!updatedTask || typeof updatedTask !== 'object') {
+                                console.error('Invalid response format:', updatedTask);
+                                return;
+                            }
+                            
+                            // Check if status is present
+                            if (!updatedTask.hasOwnProperty('status')) {
+                                console.error('Response missing status field:', updatedTask);
+                                return;
+                            }
+                            
+                            // Update task in our list
+                            const index = activeTasks.findIndex(t => t.task_id === task.task_id);
+                            if (index !== -1) {
+                                const oldStatus = activeTasks[index].status;
+                                activeTasks[index] = {
+                                    ...activeTasks[index],
+                                    ...updatedTask
+                                };
+                                
+                                const newStatus = updatedTask.status;
+                                console.log(`Updated task ${task.task_id} status: ${oldStatus} -> ${newStatus}`);
+                                
+                                // If status changed, update the UI immediately
+                                if (oldStatus !== newStatus) {
+                                    console.log('Status changed, updating UI immediately');
+                                    updateTasksView();
+                                }
+                            }
+                        } else {
+                            console.error(`Error fetching task status: ${response.status} ${response.statusText}`);
+                        }
+                    } catch (error) {
+                        console.error('Error polling task:', error);
+                    }
+                });
+                
+                // Update the UI after all tasks have been checked
+                updateTasksView();
+            }, 2000);
+        }
+        
+        // Update the tasks view
+        function updateTasksView() {
+            tasksList.innerHTML = '';
+            
+            activeTasks.forEach(task => {
+                console.log(`Rendering task ${task.task_id} with status: ${task.status}`);
+                
+                const li = document.createElement('div');
+                li.className = 'list-group-item d-flex justify-content-between align-items-center';
+                li.style.backgroundColor = '#2a2a2a';
+                li.style.color = '#eee';
+                li.style.border = '1px solid #3d3d3d';
+                li.style.marginBottom = '0.5rem';
+                
+                const statusClass = `status-${task.status}`;
+                console.log(`Using status class: ${statusClass}`);
+                
+                li.innerHTML = `
+                    <div>
+                        <strong>${task.filename}</strong><br>
+                        <small>ID: ${task.task_id}</small>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <span class="task-status ${statusClass} me-2">${task.status}</span>
+                        <!-- Refresh button commented out
+                        <button class="btn btn-sm btn-outline-light refresh-btn" data-task-id="${task.task_id}">
+                            <small>↻</small>
+                        </button>
+                        -->
+                    </div>
+                `;
+                
+                tasksList.appendChild(li);
+            });
+            
+            // Add event listeners to refresh buttons - commented out
+            /*
+            document.querySelectorAll('.refresh-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const taskId = e.target.closest('.refresh-btn').dataset.taskId;
+                    console.log(`Manual refresh for task ${taskId}`);
+                    await refreshTaskStatus(taskId);
+                });
+            });
+            */
+        }
+        
+        // Function to manually refresh a task status
+        async function refreshTaskStatus(taskId) {
+            try {
+                const timestamp = new Date().getTime();
+                const response = await fetch(`${API_URL}/task/${taskId}?_=${timestamp}`);
+                
+                if (response.ok) {
+                    const updatedTask = await response.json();
+                    console.log(`Manual refresh got update for task ${taskId}:`, updatedTask);
+                    
+                    // Update task in our list
+                    const index = activeTasks.findIndex(t => t.task_id === taskId);
+                    if (index !== -1) {
+                        const oldStatus = activeTasks[index].status;
+                        activeTasks[index] = {
+                            ...activeTasks[index],
+                            ...updatedTask
+                        };
+                        
+                        const newStatus = updatedTask.status;
+                        console.log(`Manual refresh updated task ${taskId} status: ${oldStatus} -> ${newStatus}`);
+                        
+                        // Update the UI
+                        updateTasksView();
+                    }
+                }
+            } catch (error) {
+                console.error('Error in manual refresh:', error);
+            }
+        }
+
+        // Function to load results for all files processed in the current session
+        async function loadSessionResults() {
+            try {
+                // Get all items from the gallery
+                const response = await fetch(`${API_URL}/gallery/`);
+                if (!response.ok) {
+                    throw new Error('Failed to load gallery results');
+                }
+                
+                const allItems = await response.json();
+                if (!allItems || allItems.length === 0) {
+                    return;
+                }
+                
+                // Get the filenames of completed tasks in this session
+                const completedFilenames = activeTasks
+                    .filter(task => task.status === 'completed')
+                    .map(task => task.filename);
+                
+                console.log('Completed filenames in this session:', completedFilenames);
+                
+                // Find the items that match the completed tasks in this session
+                const sessionItems = allItems.filter(item => {
+                    const filename = item.label;
+                    return completedFilenames.includes(filename);
+                });
+                
+                console.log('Found session items:', sessionItems);
+                
+                if (sessionItems.length === 0) {
+                    return;
+                }
+                
+                // Store the session items
+                sessionProcessedFiles = sessionItems;
+                
+                // Show the results container
+                const resultsContainer = document.getElementById('latest-results');
+                const resultsContent = document.getElementById('latest-results-content');
+                resultsContainer.classList.remove('d-none');
+                
+                // Clear the results content
+                resultsContent.innerHTML = '';
+                
+                // Add each session item to the results
+                sessionItems.forEach(item => {
+                    // Get relative path from the media type folder (preserving nested folder structure)
+                    // Extract everything after /outputs/videos/ or /outputs/images/
+                    const processedPathMatch = item.local_result_path.match(/\/outputs\/(videos|images)\/(.*)/);
+                    const processedFilename = processedPathMatch ? processedPathMatch[2] : item.local_result_path.split('/').pop();
+                    
+                    // Get original filename (simple filename, no nested structure in uploads)
+                    const originalFilename = item.local_original_path.split('/').pop();
+                    
+                    // Determine media type
+                    const isImage = item.media_type === 'images';
+                    
+                    // Try multiple possible URL paths for processed file
+                    const processedUrls = isImage ? [
+                        `${API_URL}/outputs/${item.media_type}/${processedFilename}`,
+                        `${API_URL}/static/outputs/${item.media_type}/${processedFilename}`,
+                        `/outputs/${item.media_type}/${processedFilename}`,
+                        `/static/outputs/${item.media_type}/${processedFilename}`
+                    ] : [
+                        // For videos, prioritize streaming endpoint with range request support
+                        `${API_URL}/stream/outputs/videos/${processedFilename}`,
+                        `/stream/outputs/videos/${processedFilename}`,
+                        `${API_URL}/outputs/${item.media_type}/${processedFilename}`,
+                        `${API_URL}/static/outputs/${item.media_type}/${processedFilename}`,
+                        `/outputs/${item.media_type}/${processedFilename}`,
+                        `/static/outputs/${item.media_type}/${processedFilename}`
+                    ];
+                    
+                    // Try multiple possible URL paths for original file
+                    const originalUrls = isImage ? [
+                        `${API_URL}/uploads/${item.media_type}/${originalFilename}`,
+                        `${API_URL}/static/uploads/${item.media_type}/${originalFilename}`,
+                        `/uploads/${item.media_type}/${originalFilename}`,
+                        `/static/uploads/${item.media_type}/${originalFilename}`
+                    ] : [
+                        // For videos, prioritize streaming endpoint with range request support
+                        `${API_URL}/stream/uploads/videos/${originalFilename}`,
+                        `/stream/uploads/videos/${originalFilename}`,
+                        `${API_URL}/uploads/${item.media_type}/${originalFilename}`,
+                        `${API_URL}/static/uploads/${item.media_type}/${originalFilename}`,
+                        `/uploads/${item.media_type}/${originalFilename}`,
+                        `/static/uploads/${item.media_type}/${originalFilename}`
+                    ];
+                    
+                    // Try alternative extensions for original file if needed
+                    const originalBaseName = originalFilename.split('.')[0];
+                    const alternativeExtensions = isImage ? ['.jpg', '.jpeg', '.png'] : ['.mp4', '.avi', '.mov', '.mkv'];
+                    alternativeExtensions.forEach(ext => {
+                        const altFilename = originalBaseName + ext;
+                        originalUrls.push(`${API_URL}/uploads/${item.media_type}/${altFilename}`);
+                        originalUrls.push(`${API_URL}/static/uploads/${item.media_type}/${altFilename}`);
+                        originalUrls.push(`/uploads/${item.media_type}/${altFilename}`);
+                        originalUrls.push(`/static/uploads/${item.media_type}/${altFilename}`);
+                    });
+                    
+                    const processedUrl = processedUrls[0]; // Start with the first URL
+                    const originalUrl = originalUrls[0]; // Start with the first URL
+                    
+                    // Generate metadata URLs for the timeline (for videos only)
+                    // Get base name from processed path (which includes folder structure)
+                    const processedBaseName = processedFilename.replace(/\.(mp4|avi|mov|mkv|jpg|jpeg|png)$/i, '');
+                    const metadataUrls = !isImage ? [
+                        `${API_URL}/metadata/${originalBaseName}_metadata.json`,
+                        `${API_URL}/outputs/videos/${processedBaseName}_metadata.json`,
+                        `${API_URL}/static/outputs/videos/${processedBaseName}_metadata.json`,
+                        `${API_URL}/outputs/result/${originalBaseName}_metadata.json`
+                    ] : [];
+                    
+                    // Create HTML for the result
+                    const resultElement = document.createElement('div');
+                    resultElement.className = 'col-md-12 mb-4';
+                    
+                    let html = `
+                        <div class="card h-100">
+                            <div class="card-header">${item.label}</div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h5>Original ${isImage ? 'Image' : 'Video'}</h5>
+                    `;
+                    
+                    if (isImage) {
+                        html += `
+                            <img src="${originalUrl}" 
+                                alt="Original" class="w-100 mb-3" style="max-height: 300px; object-fit: contain;"
+                                onerror="this.onerror=null; 
+                                        if(this.src !== '${originalUrls[1]}') this.src='${originalUrls[1]}';
+                                        else if(this.src !== '${originalUrls[2]}') this.src='${originalUrls[2]}';
+                                        else if(this.src !== '${originalUrls[3]}') this.src='${originalUrls[3]}';
+                                        else this.alt='Failed to load image';">
+                            <div class="text-center">
+                                <a href="${originalUrl}" class="btn btn-sm btn-primary" target="_blank">
+                                    <i class="bi bi-arrows-fullscreen"></i> View Full Size
+                                </a>
+                            </div>
+                        `;
+                    } else {
+                        html += `
+                            <video class="w-100 mb-3 sync-video" 
+                                   data-pair-index="${sessionItems.indexOf(item)}"
+                                   data-metadata-urls="${metadataUrls.join(',')}">
+                                ${originalUrls.map(url => `<source src="${url}" type="video/mp4">`).join('\n')}
+                                Your browser does not support video playback.
+                            </video>
+                        `;
+                    }
+                    
+                    html += `
+
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h5>Processed ${isImage ? 'Image' : 'Video'}</h5>
+                    `;
+                    
+                    if (isImage) {
+                        html += `
+                            <img src="${processedUrl}" 
+                                alt="Processed" class="w-100 mb-3" style="max-height: 300px; object-fit: contain;"
+                                onerror="this.onerror=null; 
+                                        if(this.src !== '${processedUrls[1]}') this.src='${processedUrls[1]}';
+                                        else if(this.src !== '${processedUrls[2]}') this.src='${processedUrls[2]}';
+                                        else if(this.src !== '${processedUrls[3]}') this.src='${processedUrls[3]}';
+                                        else this.alt='Failed to load image';">
+                            <div class="text-center">
+                                <a href="${processedUrl}" class="btn btn-sm btn-primary" target="_blank">
+                                    <i class="bi bi-arrows-fullscreen"></i> View Full Size
+                                </a>
+                            </div>
+                        `;
+                    } else {
+                        html += `
+                            <video class="w-100 mb-3 sync-video" 
+                                   data-pair-index="${sessionItems.indexOf(item)}"
+                                   data-metadata-urls="${metadataUrls.join(',')}">
+                                ${processedUrls.map(url => `<source src="${url}" type="video/mp4">`).join('\n')}
+                                Your browser does not support video playback.
+                            </video>
+                        `;
+                    }
+                    
+                    html += `
+
+                                    </div>
+                                </div>
+                                <div class="text-center mt-3">
+                                    <button class="btn btn-success start-segmentation-btn" 
+                                            data-${isImage ? 'image' : 'video'}-path="${item.local_original_path}" 
+                                            data-filename="${item.label}"
+                                            data-media-type="${isImage ? 'image' : 'video'}">
+                                        <i class="bi bi-palette"></i> Start Segmentation
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    resultElement.innerHTML = html;
+                    resultsContent.appendChild(resultElement);
+                });
+                
+                // Add a link to the gallery at the bottom
+                const galleryLinkElement = document.createElement('div');
+                galleryLinkElement.className = 'col-12 text-center mt-3';
+                galleryLinkElement.innerHTML = `
+                                                    <a href="detection-gallery.html" class="btn btn-primary mx-2">Detection Gallery</a>
+                `;
+                resultsContent.appendChild(galleryLinkElement);
+                
+                // Debug: Log all .sync-video elements and their data-pair-index
+                const allSyncVideos = document.querySelectorAll('#latest-results .sync-video');
+                console.log('DEBUG: Found', allSyncVideos.length, '.sync-video elements in #latest-results');
+                allSyncVideos.forEach((vid, idx) => {
+                    console.log(`DEBUG: sync-video[${idx}] data-pair-index=`, vid.dataset.pairIndex, vid);
+                });
+
+                // Manually trigger video synchronization for dynamically added videos
+                if (window.VideoSynchronizer) {
+                    // The modular system is loaded, set up video sync manually
+                    const videoPairs = {};
+                    document.querySelectorAll('#latest-results .sync-video').forEach(video => {
+                        const pairIndex = video.dataset.pairIndex;
+                        if (!pairIndex) return;
+                        if (!videoPairs[pairIndex]) {
+                            videoPairs[pairIndex] = [];
+                        }
+                        if (!videoPairs[pairIndex].includes(video)) {
+                            videoPairs[pairIndex].push(video);
+                            console.log(`DEBUG: Added video to pairIndex ${pairIndex}. Current pair:`, videoPairs[pairIndex]);
+                            // When we have a pair, create a synchronizer
+                            if (videoPairs[pairIndex].length === 2) {
+                                console.log(`DEBUG: Creating VideoSynchronizer for pairIndex ${pairIndex}`, videoPairs[pairIndex]);
+                                const synchronizer = new window.VideoSynchronizer(
+                                    videoPairs[pairIndex][0], 
+                                    videoPairs[pairIndex][1],
+                                    pairIndex
+                                );
+                                // Hide the native video controls
+                                videoPairs[pairIndex][0].controls = false;
+                                videoPairs[pairIndex][1].controls = false;
+                                console.log(`Created video synchronizer for pair ${pairIndex} in session results`);
+                            }
+                        }
+                    });
+                } else {
+                    console.log('VideoSynchronizer not yet available, will be handled by loader');
+                }
+                
+                // Auto-play the first video pair in the results after a short delay
+                setTimeout(() => {
+                    const videoElements = document.querySelectorAll('#latest-results .sync-video');
+                    if (videoElements.length >= 2) {
+                        console.log('Auto-playing first video pair after analysis');
+                        // Try to play the second video (processed) which will be the master
+                        // The synchronizer will handle playing the paired video
+                        const processedVideo = videoElements[1]; // The second video in each pair (processed)
+                        
+                        // Check if it's really a video (not an image)
+                        if (processedVideo && processedVideo.tagName === 'VIDEO') {
+                            try {
+                                const playPromise = processedVideo.play();
+                                if (playPromise) {
+                                    playPromise.catch(e => {
+                                        console.warn('Auto-play failed (browser may require user interaction):', e);
+                                    });
+                                }
+                            } catch (error) {
+                                console.warn('Error during auto-play:', error);
+                            }
+                        }
+                    }
+                }, 1000); // Wait 1 second to ensure everything is loaded and sync is set up
+                
+                // Add event listeners to segmentation buttons
+                // Check segmentation status and update buttons
+                async function checkAndUpdateSegmentationButtons() {
+                    document.querySelectorAll('.start-segmentation-btn').forEach(async (btn) => {
+                        const filename = btn.dataset.filename;
+                        if (!filename) return;
+                        
+                        try {
+                            const response = await fetch(`${API_URL}/segmentation/check/${encodeURIComponent(filename)}`);
+                            const data = await response.json();
+                            
+                            if (data.exists) {
+                                const mediaType = btn.dataset.mediaType || 'image';
+                                btn.disabled = true;
+                                btn.classList.remove('btn-success');
+                                btn.classList.add('btn-secondary');
+                                btn.innerHTML = `<i class="bi bi-check-circle"></i> ${mediaType === 'image' ? 'Image' : 'Video'} Already Segmented`;
+                            }
+                        } catch (error) {
+                            console.error('Error checking segmentation status:', error);
+                        }
+                    });
+                }
+                
+                document.querySelectorAll('.start-segmentation-btn').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        // Don't process if already segmented
+                        if (e.target.disabled && e.target.classList.contains('btn-secondary')) {
+                            return;
+                        }
+                        
+                        // Handle both images and videos
+                        const mediaPath = e.target.dataset.videoPath || e.target.dataset.imagePath;
+                        const filename = e.target.dataset.filename;
+                        const isImage = !!e.target.dataset.imagePath;
+                        const mediaType = e.target.dataset.mediaType || (isImage ? 'image' : 'video');
+                        
+                        try {
+                            e.target.disabled = true;
+                            e.target.classList.remove('btn-success');
+                            e.target.classList.add('btn-warning');
+                            e.target.innerHTML = '<i class="bi bi-hourglass-split"></i> Processing...';
+                            
+                            const formData = new FormData();
+                            // Use appropriate parameter name based on media type
+                            if (isImage) {
+                                formData.append('image_path', mediaPath);
+                            } else {
+                                formData.append('video_path', mediaPath);
+                            }
+                            formData.append('original_filename', filename);
+                            
+                            const response = await fetch(`${API_URL}/segmentation/`, {
+                                method: 'POST',
+                                body: formData
+                            });
+                            
+                            if (!response.ok) {
+                                throw new Error('Failed to start segmentation');
+                            }
+                            
+                            const data = await response.json();
+                            
+                            // Show success message and start monitoring
+                            showNotification(`Segmentation started for ${filename}`, 'info');
+                            startSegmentationMonitoring(data.task_id, filename, e.target, mediaType);
+                            
+                        } catch (error) {
+                            console.error('Error starting segmentation:', error);
+                            showNotification('Failed to start segmentation: ' + error.message, 'error');
+                            e.target.disabled = false;
+                            e.target.classList.remove('btn-warning');
+                            e.target.classList.add('btn-success');
+                            e.target.innerHTML = '<i class="bi bi-palette"></i> Start Segmentation';
+                        }
+                    });
+                });
+                
+                // Check segmentation status when page loads
+                checkAndUpdateSegmentationButtons();
+                
+                // Attach fullscreen viewer to images
+                if (window.attachFullscreenToImages) {
+                    attachFullscreenToImages();
+                }
+                
+            } catch (error) {
+                console.error('Error loading session results:', error);
+            }
+        }
+
+        // Function to load the latest results - no longer used, replaced by loadSessionResults
+        async function loadLatestResults() {
+            // ... existing code ...
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

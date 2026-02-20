@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detection Gallery - FireTools Detection Platform</title>
+    <!-- Cache-busting meta tags -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/static/css/common.css">
+    <style>
+        /* Gallery specific styles */
+        .gallery-item {
+            margin-bottom: 1.5rem;
+        }
+        .gallery-img {
+            width: 100%;
+            height: 300px;
+            object-fit: contain;
+        }
+        .media-container {
+            position: relative;
+        }
+        
+        /* Notification system styles */
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            max-width: 400px;
+        }
+        
+        .notification {
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            animation: slideIn 0.3s ease-out;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .notification.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .notification.info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .notification.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .notification-content {
+            flex: 1;
+            margin-right: 10px;
+        }
+        
+        .notification-button {
+            background: none;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+        
+        .notification.success .notification-button {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .notification.success .notification-button:hover {
+            background-color: #218838;
+        }
+        
+        .notification-close {
+            background: none;
+            border: none;
+            font-size: 1.2em;
+            cursor: pointer;
+            opacity: 0.7;
+            margin-left: 10px;
+        }
+        
+        .notification-close:hover {
+            opacity: 1;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Notification Container -->
+    <div class="notification-container" id="notificationContainer"></div>
+    
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">FireTools</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Upload</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="detection-gallery.html">Detection Gallery</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="segmentation-gallery.html">Segmentation Gallery</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="frames-gallery.html">Frames Gallery</a>
+                    </li>
+                </ul>
+                <button id="theme-toggle" class="btn btn-outline-primary">
+                    <i class="bi bi-sun-fill"></i> Light Mode
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="header mt-4">Detection Gallery</h1>
+        <p class="subtitle">View all your processed fire detection results - images and videos</p>
+
+        <div class="row">
+            <div class="col-lg-10 offset-lg-1">
+                <div id="detection-gallery" class="card">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2>Detection Results</h2>
+                        <div>
+                            <button id="clear-images" class="btn btn-warning me-2">Clear Images</button>
+                            <button id="clear-videos" class="btn btn-warning me-2">Clear Videos</button>
+                            <button id="clear-all" class="btn btn-danger">Clear All</button>
+                        </div>
+                    </div>
+                    
+                    <div id="detection-container" class="row"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>© 2025 FireTools Research Project · Instituto Superior Técnico</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/theme.js"></script>
+    <script src="/static/js/image-fullscreen.js"></script>
+    <script src="/static/js/video-sync-loader.js"></script>
+    <script>
+        // Notification system
+        function showNotification(message, type = 'info', buttonText = null, buttonAction = null) {
+            const container = document.getElementById('notificationContainer');
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            
+            const content = document.createElement('div');
+            content.className = 'notification-content';
+            content.textContent = message;
+            
+            notification.appendChild(content);
+            
+            if (buttonText && buttonAction) {
+                const button = document.createElement('button');
+                button.className = 'notification-button';
+                button.textContent = buttonText;
+                button.onclick = buttonAction;
+                notification.appendChild(button);
+            }
+            
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'notification-close';
+            closeBtn.innerHTML = '&times;';
+            closeBtn.onclick = () => notification.remove();
+            notification.appendChild(closeBtn);
+            
+            container.appendChild(notification);
+            
+            // Auto-remove after 10 seconds for non-success notifications
+            if (type !== 'success') {
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.remove();
+                    }
+                }, 10000);
+            }
+        }
+        
+        // Segmentation monitoring
+        let segmentationMonitors = new Map();
+        let shownNotifications = new Set(); // Track shown notifications to prevent duplicates
+        
+        function startSegmentationMonitoring(taskId, filename, buttonElement = null, mediaType = 'image') {
+            // Clear any existing monitor for this task
+            if (segmentationMonitors.has(taskId)) {
+                clearInterval(segmentationMonitors.get(taskId));
+            }
+            
+            const notificationKey = `${taskId}-${filename}`;
+            
+            const monitor = setInterval(async () => {
+                try {
+                    const response = await fetch(`${API_URL}/segmentation/status/${taskId}`);
+                    const data = await response.json();
+                    
+                    if (data.status === 'completed') {
+                        clearInterval(monitor);
+                        segmentationMonitors.delete(taskId);
+                        
+                        // Update button to "Already Segmented" state
+                        if (buttonElement) {
+                            buttonElement.disabled = true;
+                            buttonElement.classList.remove('btn-warning');
+                            buttonElement.classList.add('btn-secondary');
+                            buttonElement.innerHTML = `<i class="bi bi-check-circle"></i> ${mediaType === 'image' ? 'Image' : 'Video'} Already Segmented`;
+                        }
+                        
+                        // Only show notification if we haven't shown it before
+                        if (!shownNotifications.has(notificationKey)) {
+                            shownNotifications.add(notificationKey);
+                            showNotification(
+                                `Segmentation completed for ${filename}!`,
+                                'success',
+                                'View Results',
+                                () => window.location.href = 'segmentation-gallery.html'
+                            );
+                        }
+                    } else if (data.status === 'failed') {
+                        clearInterval(monitor);
+                        segmentationMonitors.delete(taskId);
+                        
+                        // Reset button on failure
+                        if (buttonElement) {
+                            buttonElement.disabled = false;
+                            buttonElement.classList.remove('btn-warning');
+                            buttonElement.classList.add('btn-success');
+                            buttonElement.innerHTML = '<i class="bi bi-palette"></i> Start Segmentation';
+                        }
+                        
+                        // Only show notification if we haven't shown it before
+                        if (!shownNotifications.has(notificationKey)) {
+                            shownNotifications.add(notificationKey);
+                            showNotification(
+                                `Segmentation failed for ${filename}: ${data.error || 'Unknown error'}`,
+                                'error'
+                            );
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error checking segmentation status:', error);
+                }
+            }, 5000); // Check every 5 seconds
+            
+            segmentationMonitors.set(taskId, monitor);
+        }
+        
+        // Initialize theme when DOM is loaded
+        window.addEventListener('DOMContentLoaded', () => {
+            initializeTheme();
+        });
+        
+        // API URL - change this to match your FastAPI server
+        const API_URL = window.location.origin;
+        
+        // DOM elements
+        const detectionContainer = document.getElementById('detection-container');
+        const clearImagesBtn = document.getElementById('clear-images');
+        const clearVideosBtn = document.getElementById('clear-videos');
+        const clearAllBtn = document.getElementById('clear-all');
+        
+        // Load gallery on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            loadGallery();
+        });
+        
+        // Clear gallery buttons
+        clearImagesBtn.addEventListener('click', () => clearGallery('images'));
+        clearVideosBtn.addEventListener('click', () => clearGallery('videos'));
+        clearAllBtn.addEventListener('click', () => clearGallery('all'));
+        
+        // Load gallery items
+        async function loadGallery() {
+            try {
+                // Fetch both images and videos
+                const [imagesResponse, videosResponse] = await Promise.all([
+                    fetch(`${API_URL}/gallery/?media_type=images`),
+                    fetch(`${API_URL}/gallery/?media_type=videos`)
+                ]);
+                
+                if (!imagesResponse.ok || !videosResponse.ok) {
+                    throw new Error('Failed to load gallery');
+                }
+                
+                const images = await imagesResponse.json();
+                const videos = await videosResponse.json();
+                
+                // Combine and sort all items by label
+                const allItems = [
+                    ...images.map(item => ({ ...item, mediaType: 'image' })),
+                    ...videos.map(item => ({ ...item, mediaType: 'video' }))
+                ].sort((a, b) => a.label.localeCompare(b.label));
+                
+                detectionContainer.innerHTML = '';
+                
+                if (allItems.length === 0) {
+                    detectionContainer.innerHTML = '<div class="col-12 text-center py-5">No detection results yet. Upload and process images or videos to see results here.</div>';
+                    return;
+                }
+                
+                allItems.forEach((item, index) => {
+                    const col = document.createElement('div');
+                    col.className = 'col-md-12 gallery-item';
+                    
+                    if (item.mediaType === 'image') {
+                        renderImageItem(col, item, allItems);
+                    } else {
+                        renderVideoItem(col, item, allItems, index);
+                    }
+                    
+                    detectionContainer.appendChild(col);
+                });
+                
+                // Add event listeners to the delete buttons
+                addDeleteEventListeners(allItems);
+                
+                // Add event listeners to segmentation buttons
+                addSegmentationEventListeners();
+                checkAndUpdateSegmentationButtons();
+                
+                // Set up video synchronization
+                setupVideoSynchronization();
+                
+                // Attach fullscreen viewer to images
+                if (window.attachFullscreenToImages) {
+                    attachFullscreenToImages();
+                }
+                
+            } catch (error) {
+                console.error('Error loading detection gallery:', error);
+                detectionContainer.innerHTML = '<div class="col-12 text-center py-5 text-danger">Error loading detection results. Please try refreshing the page.</div>';
+            }
+        }
+        
+        // Render image item
+        function renderImageItem(col, item, allItems) {
+            // Get relative path from the media type folder (preserving nested folder structure)
+            const processedPathMatch = item.local_result_path.match(/\/outputs\/(videos|images)\/(.*)/);
+            const processedFilename = processedPathMatch ? processedPathMatch[2] : item.local_result_path.split('/').pop();
+            const originalFilename = item.local_original_path.split('/').pop();
+            
+            // Try multiple possible URL paths for processed image
+            const processedUrls = [
+                `${API_URL}/outputs/images/${processedFilename}`,
+                `${API_URL}/static/outputs/images/${processedFilename}`,
+                `/outputs/images/${processedFilename}`,
+                `/static/outputs/images/${processedFilename}`
+            ];
+            
+            // Try multiple possible URL paths for original image
+            const originalUrls = [
+                `${API_URL}/uploads/images/${originalFilename}`,
+                `${API_URL}/static/uploads/images/${originalFilename}`,
+                `/uploads/images/${originalFilename}`,
+                `/static/uploads/images/${originalFilename}`
+            ];
+            
+            // Try alternative extensions for original image if needed
+            const originalBaseName = originalFilename.split('.')[0];
+            const alternativeExtensions = ['.jpg', '.jpeg', '.png'];
+            alternativeExtensions.forEach(ext => {
+                const altFilename = originalBaseName + ext;
+                originalUrls.push(`${API_URL}/uploads/images/${altFilename}`);
+                originalUrls.push(`${API_URL}/static/uploads/images/${altFilename}`);
+                originalUrls.push(`/uploads/images/${altFilename}`);
+                originalUrls.push(`/static/uploads/images/${altFilename}`);
+            });
+            
+            const processedUrl = processedUrls[0];
+            const originalUrl = originalUrls[0];
+            
+            col.innerHTML = `
+                <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span>${item.label}</span>
+                        <button class="btn btn-sm btn-danger delete-btn" data-item-id="${processedFilename}" data-media-type="image">Remove</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>Original Image</h5>
+                                <img src="${originalUrl}" 
+                                    alt="Original" class="gallery-img mb-3"
+                                    onerror="this.onerror=null; 
+                                            if(this.src !== '${originalUrls[1]}') this.src='${originalUrls[1]}';
+                                            else if(this.src !== '${originalUrls[2]}') this.src='${originalUrls[2]}';
+                                            else if(this.src !== '${originalUrls[3]}') this.src='${originalUrls[3]}';
+                                            else this.alt='Failed to load image';">
+                                <div class="d-flex justify-content-between">
+                                    <a href="${originalUrl}" 
+                                        class="btn btn-sm btn-primary" target="_blank">
+                                        View Full Size
+                                    </a>
+                                    <small class="text-muted">File: ${originalFilename}</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Processed Image (with Detection)</h5>
+                                <img src="${processedUrl}" 
+                                    alt="Processed" class="gallery-img mb-3"
+                                    onerror="this.onerror=null; 
+                                            if(this.src !== '${processedUrls[1]}') this.src='${processedUrls[1]}';
+                                            else if(this.src !== '${processedUrls[2]}') this.src='${processedUrls[2]}';
+                                            else if(this.src !== '${processedUrls[3]}') this.src='${processedUrls[3]}';
+                                            else this.alt='Failed to load image';">
+                                <div class="d-flex justify-content-between">
+                                    <a href="${processedUrl}" 
+                                        class="btn btn-sm btn-primary" target="_blank">
+                                        View Full Size
+                                    </a>
+                                    <small class="text-muted">File: ${processedFilename}</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center mt-3">
+                            <button class="btn btn-success start-segmentation-btn" 
+                                    data-image-path="${item.local_original_path}" 
+                                    data-filename="${item.label}"
+                                    data-media-type="image">
+                                <i class="bi bi-palette"></i> Start Segmentation
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Render video item
+        function renderVideoItem(col, item, allItems, index) {
+            // Get relative path from the media type folder (preserving nested folder structure)
+            const processedPathMatch = item.local_result_path.match(/\/outputs\/(videos|images)\/(.*)/);
+            const processedFilename = processedPathMatch ? processedPathMatch[2] : item.local_result_path.split('/').pop();
+            const originalFilename = item.local_original_path.split('/').pop();
+            
+            // Try multiple possible URL paths for processed video
+            // Prioritize streaming endpoint with range request support
+            const processedUrls = [
+                `${API_URL}/stream/outputs/videos/${processedFilename}`,
+                `/stream/outputs/videos/${processedFilename}`,
+                `${API_URL}/outputs/videos/${processedFilename}`,
+                `${API_URL}/static/outputs/videos/${processedFilename}`,
+                `/outputs/videos/${processedFilename}`,
+                `/static/outputs/videos/${processedFilename}`
+            ];
+            
+            // Handle original video URLs differently for converted files
+            let originalUrls = [];
+            
+            if (item.was_converted) {
+                // For converted files, show the converted MP4 from uploads directory as "original"
+                const convertedFilename = item.converted_filename || `${item.label.split('.')[0]}_converted.mp4`;
+                originalUrls = [
+                    `${API_URL}/stream/uploads/videos/${convertedFilename}`,
+                    `/stream/uploads/videos/${convertedFilename}`,
+                    `${API_URL}/uploads/videos/${convertedFilename}`,
+                    `${API_URL}/static/uploads/videos/${convertedFilename}`,
+                    `/uploads/videos/${convertedFilename}`,
+                    `/static/uploads/videos/${convertedFilename}`
+                ];
+            } else {
+                // For non-converted files, use normal upload paths with fallbacks
+                originalUrls = [
+                    `${API_URL}/stream/uploads/videos/${originalFilename}`,
+                    `/stream/uploads/videos/${originalFilename}`,
+                    `${API_URL}/uploads/videos/${originalFilename}`,
+                    `${API_URL}/static/uploads/videos/${originalFilename}`,
+                    `/uploads/videos/${originalFilename}`,
+                    `/static/uploads/videos/${originalFilename}`
+                ];
+                
+                // Try alternative extensions for non-converted videos only
+                const originalBaseName = originalFilename.split('.')[0];
+                const alternativeExtensions = ['.mp4', '.avi', '.mov', '.mkv'];
+                alternativeExtensions.forEach(ext => {
+                    const altFilename = originalBaseName + ext;
+                    originalUrls.push(`${API_URL}/stream/uploads/videos/${altFilename}`);
+                    originalUrls.push(`/stream/uploads/videos/${altFilename}`);
+                    originalUrls.push(`${API_URL}/uploads/videos/${altFilename}`);
+                    originalUrls.push(`${API_URL}/static/uploads/videos/${altFilename}`);
+                    originalUrls.push(`/uploads/videos/${altFilename}`);
+                    originalUrls.push(`/static/uploads/videos/${altFilename}`);
+                });
+            }
+            
+            // Generate metadata URLs for the timeline
+            const originalBaseName = originalFilename.split('.')[0];
+            // Get base name from processed path (which includes folder structure)
+            const processedBaseName = processedFilename.replace(/\.(mp4|avi|mov|mkv)$/i, '');
+            const metadataUrls = [
+                `${API_URL}/metadata/${originalBaseName}_metadata.json`,
+                `${API_URL}/outputs/videos/${processedBaseName}_metadata.json`,
+                `${API_URL}/static/outputs/videos/${processedBaseName}_metadata.json`,
+                `${API_URL}/outputs/result/${originalBaseName}_metadata.json`
+            ];
+            
+            col.innerHTML = `
+                <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span>
+                            ${item.label}
+                            ${item.was_converted ? '<small class="text-muted ms-2">(converted to MP4 for display)</small>' : ''}
+                        </span>
+                        <button class="btn btn-sm btn-danger delete-btn" data-item-id="${processedFilename}" data-media-type="video">Remove</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>${item.was_converted ? 'Original Video (MP4 Version)' : 'Original Video'}</h5>
+                                <video class="w-100 mb-3 sync-video" 
+                                       data-pair-index="${index}"
+                                       data-metadata-urls="${metadataUrls.join(',')}">
+                                    ${originalUrls.map(url => `<source src="${url}" type="video/mp4">`).join('\n')}
+                                    Your browser does not support video playback.
+                                </video>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Processed Video (with Detection)</h5>
+                                <video class="w-100 mb-3 sync-video" 
+                                       data-pair-index="${index}"
+                                       data-metadata-urls="${metadataUrls.join(',')}">
+                                    ${processedUrls.map(url => `<source src="${url}" type="video/mp4">`).join('\n')}
+                                    Your browser does not support video playback.
+                                </video>
+                            </div>
+                        </div>
+                        <div class="text-center mt-3">
+                            <button class="btn btn-success start-segmentation-btn" 
+                                    data-video-path="${item.actual_original_path || item.local_original_path}" 
+                                    data-filename="${item.label}"
+                                    data-media-type="video">
+                                <i class="bi bi-palette"></i> Start Segmentation
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Add delete event listeners
+        function addDeleteEventListeners(allItems) {
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const itemId = e.target.dataset.itemId;
+                    const mediaType = e.target.dataset.mediaType;
+                    
+                    if (confirm(`Are you sure you want to remove this ${mediaType}?`)) {
+                        try {
+                            // Find the item in the gallery by ID (using full path)
+                            const itemToDelete = allItems.find(item => {
+                                // Extract relative path to compare with itemId
+                                const pathMatch = item.local_result_path.match(/\/outputs\/(videos|images)\/(.*)/);
+                                const relativePath = pathMatch ? pathMatch[2] : item.local_result_path.split('/').pop();
+                                return relativePath === itemId;
+                            });
+                            
+                            if (!itemToDelete) {
+                                console.error('Item not found for deletion');
+                                return;
+                            }
+                            
+                            // Remove the item from the gallery
+                            const response = await fetch(`${API_URL}/gallery/item`, {
+                                method: 'DELETE',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    path: itemToDelete.local_result_path
+                                })
+                            });
+                            
+                            if (!response.ok) {
+                                throw new Error('Failed to delete item');
+                            }
+                            
+                            // Reload the gallery
+                            loadGallery();
+                        } catch (error) {
+                            console.error('Error deleting item:', error);
+                            alert('Failed to delete item: ' + error.message);
+                        }
+                    }
+                });
+            });
+        }
+        
+        // Add segmentation event listeners
+        // Check segmentation status and update buttons
+        async function checkAndUpdateSegmentationButtons() {
+            document.querySelectorAll('.start-segmentation-btn').forEach(async (btn) => {
+                const filename = btn.dataset.filename;
+                if (!filename) return;
+                
+                try {
+                    const response = await fetch(`${API_URL}/segmentation/check/${encodeURIComponent(filename)}`);
+                    const data = await response.json();
+                    
+                    if (data.exists) {
+                        const mediaType = btn.dataset.mediaType || (btn.dataset.imagePath ? 'image' : 'video');
+                        btn.disabled = true;
+                        btn.classList.remove('btn-success');
+                        btn.classList.add('btn-secondary');
+                        btn.innerHTML = `<i class="bi bi-check-circle"></i> ${mediaType === 'image' ? 'Image' : 'Video'} Already Segmented`;
+                    }
+                } catch (error) {
+                    console.error('Error checking segmentation status:', error);
+                }
+            });
+        }
+        
+        function addSegmentationEventListeners() {
+            document.querySelectorAll('.start-segmentation-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    // Don't process if already segmented
+                    if (e.target.disabled && e.target.classList.contains('btn-secondary')) {
+                        return;
+                    }
+                    
+                    const imagePath = e.target.dataset.imagePath;
+                    const videoPath = e.target.dataset.videoPath;
+                    const filename = e.target.dataset.filename;
+                    const mediaPath = imagePath || videoPath;
+                    const mediaType = imagePath ? 'image' : 'video';
+                    
+                    try {
+                        e.target.disabled = true;
+                        e.target.classList.remove('btn-success');
+                        e.target.classList.add('btn-warning');
+                        e.target.innerHTML = '<i class="bi bi-hourglass-split"></i> Processing...';
+                        
+                        const formData = new FormData();
+                        if (mediaType === 'image') {
+                            formData.append('image_path', mediaPath);
+                        } else {
+                            formData.append('video_path', mediaPath);
+                        }
+                        formData.append('original_filename', filename);
+                        
+                        const response = await fetch(`${API_URL}/segmentation/`, {
+                            method: 'POST',
+                            body: formData
+                        });
+                        
+                        if (!response.ok) {
+                            throw new Error('Failed to start segmentation');
+                        }
+                        
+                        const data = await response.json();
+                        
+                        // Show success message and start monitoring
+                        showNotification(`Segmentation started for ${filename}`, 'info');
+                        startSegmentationMonitoring(data.task_id, filename, e.target, mediaType);
+                        
+                    } catch (error) {
+                        console.error('Error starting segmentation:', error);
+                        showNotification('Failed to start segmentation: ' + error.message, 'error');
+                        e.target.disabled = false;
+                        e.target.classList.remove('btn-warning');
+                        e.target.classList.add('btn-success');
+                        e.target.innerHTML = '<i class="bi bi-palette"></i> Start Segmentation';
+                    }
+                });
+            });
+        }
+        
+        // Setup video synchronization
+        function setupVideoSynchronization() {
+            if (window.VideoSynchronizer) {
+                // The modular system is loaded, set up video sync manually
+                const videoPairs = {};
+                
+                document.querySelectorAll('.sync-video').forEach(video => {
+                    const pairIndex = video.dataset.pairIndex;
+                    if (!pairIndex) return;
+                    
+                    if (!videoPairs[pairIndex]) {
+                        videoPairs[pairIndex] = [];
+                    }
+                    
+                    if (!videoPairs[pairIndex].includes(video)) {
+                        videoPairs[pairIndex].push(video);
+                        
+                        // When we have a pair, create a synchronizer
+                        if (videoPairs[pairIndex].length === 2) {
+                            const synchronizer = new window.VideoSynchronizer(
+                                videoPairs[pairIndex][0], 
+                                videoPairs[pairIndex][1],
+                                pairIndex
+                            );
+                            
+                            // Hide the native video controls
+                            videoPairs[pairIndex][0].controls = false;
+                            videoPairs[pairIndex][1].controls = false;
+                            
+                            console.log(`Created video synchronizer for pair ${pairIndex}`);
+                        }
+                    }
+                });
+            } else {
+                console.log('VideoSynchronizer not yet available, will be handled by loader');
+            }
+        }
+        
+        // Clear gallery
+        async function clearGallery(type) {
+            let confirmMessage;
+            let endpoint;
+            
+            switch(type) {
+                case 'images':
+                    confirmMessage = 'Are you sure you want to clear all images from the detection gallery?';
+                    endpoint = `${API_URL}/gallery/images`;
+                    break;
+                case 'videos':
+                    confirmMessage = 'Are you sure you want to clear all videos from the detection gallery?';
+                    endpoint = `${API_URL}/gallery/videos`;
+                    break;
+                case 'all':
+                    confirmMessage = 'Are you sure you want to clear the entire detection gallery (both images and videos)?';
+                    // We'll need to call both endpoints
+                    break;
+                default:
+                    return;
+            }
+            
+            if (!confirm(confirmMessage)) {
+                return;
+            }
+            
+            try {
+                if (type === 'all') {
+                    // Clear both images and videos
+                    const [imagesResponse, videosResponse] = await Promise.all([
+                        fetch(`${API_URL}/gallery/images`, { method: 'DELETE' }),
+                        fetch(`${API_URL}/gallery/videos`, { method: 'DELETE' })
+                    ]);
+                    
+                    if (!imagesResponse.ok || !videosResponse.ok) {
+                        throw new Error('Failed to clear gallery');
+                    }
+                } else {
+                    const response = await fetch(endpoint, { method: 'DELETE' });
+                    
+                    if (!response.ok) {
+                        throw new Error('Failed to clear gallery');
+                    }
+                }
+                
+                // Reload the gallery
+                loadGallery();
+                
+            } catch (error) {
+                console.error('Error clearing gallery:', error);
+                alert('Failed to clear gallery: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>

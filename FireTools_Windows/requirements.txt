@@ -1,0 +1,46 @@
+# FireTools Interface - Python Package Requirements
+# 
+# PREREQUISITES (install these FIRST - cannot be installed via pip):
+# 1. Python 3.11 - Windows: winget install --id Python.Python.3.11 -e
+# 2. FFmpeg - Windows: winget install --id Gyan.FFmpeg -e
+# 
+# See README.md "Installation" section for complete step-by-step setup guide.
+
+# Web Framework
+fastapi==0.95.0
+uvicorn[standard]==0.21.1
+python-multipart==0.0.6
+pydantic==1.10.7
+
+# Deep Learning
+torch>=2.0.0
+ultralytics>=8.0.0
+segmentation-models-pytorch>=0.3.3
+huggingface-hub>=0.24,<1.0  # Pinned to resolve conflict with tokenizers
+
+# Computer Vision
+opencv-python>=4.5.0
+albumentations>=1.4.0
+scikit-image>=0.19.0
+
+# Scientific Computing
+numpy>=1.21.0
+scipy>=1.7.0
+
+# Utilities
+tqdm>=4.62.0
+python-dotenv>=1.0.0
+
+# Optional (for SSH/SCP features if needed)
+paramiko>=3.3.1
+scp>=0.14.5
+
+# Note: uuid is part of Python standard library (no need to install)
+
+# IMPORTANT: FFmpeg is required for video processing but must be installed separately
+# Windows: winget install --id Gyan.FFmpeg -e
+# Linux: sudo apt-get install ffmpeg
+# macOS: brew install ffmpeg
+
+# Note: For GPU support, install PyTorch with CUDA BEFORE running pip install -r requirements.txt:
+#   pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121

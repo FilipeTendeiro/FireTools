@@ -1,0 +1,355 @@
+/* Theme variables */
+:root {
+    --bg-color: #1e1e1e;
+    --text-color: #eee;
+    --card-bg: #2a2a2a;
+    --card-border: #3d3d3d;
+    --navbar-bg: #2a2a2a;
+    --nav-text-color: #eee;
+    --nav-link-color: #eee;
+    --nav-link-hover: #8c42f5;
+    --nav-link-active: #8c42f5;
+    --subtitle-color: #d0d0d0;
+    --section-bg: #2a2a2a;
+    --header-color: #8c42f5;
+}
+
+[data-theme="light"] {
+    --bg-color: #f8f9fa;
+    --text-color: #212529;
+    --card-bg: #ffffff;
+    --card-border: #dee2e6;
+    --navbar-bg: #e0e0e0;
+    --nav-text-color: #212529;
+    --nav-link-color: #212529;
+    --nav-link-hover: #6a0dad;
+    --nav-link-active: #6a0dad;
+    --subtitle-color: #2a2a2a;
+    --section-bg: #e0e0e0;
+    --header-color: #8c42f5;
+}
+
+/* Base styles */
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* Header and subtitle styles */
+.header {
+    color: var(--header-color);
+    font-weight: 700;
+    text-align: center;
+    padding: 2rem 0;
+}
+
+.subtitle {
+    color: var(--subtitle-color);
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+/* Navbar styles */
+.navbar {
+    background-color: var(--navbar-bg) !important;
+    border-bottom: 4px solid #8c42f5;
+    transition: background-color 0.3s;
+}
+
+.navbar-brand {
+    color: var(--nav-text-color) !important;
+    font-weight: 600;
+}
+
+.nav-link {
+    color: var(--nav-link-color) !important;
+    transition: color 0.3s;
+}
+
+.nav-link:hover {
+    color: var(--nav-link-hover) !important;
+}
+
+.nav-link.active {
+    color: var(--nav-link-active) !important;
+    font-weight: 600;
+}
+
+/* Theme toggle button */
+#theme-toggle {
+    color: var(--nav-text-color);
+    border-color: var(--nav-text-color);
+}
+
+#theme-toggle:hover {
+    background-color: var(--nav-text-color);
+    color: var(--navbar-bg);
+}
+
+/* Section styles */
+#upload, #image-gallery, #video-gallery {
+    background-color: var(--section-bg);
+    border: 2px solid var(--card-border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    transition: all 0.2s;
+}
+
+#upload:hover, #image-gallery:hover, #video-gallery:hover {
+    border-color: #8c42f5;
+    box-shadow: 0 0 15px rgba(140, 66, 245, 0.4);
+}
+
+/* Card styles */
+.card {
+    background-color: var(--card-bg);
+    border: 2px solid var(--card-border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    transition: all 0.2s;
+}
+
+.card:hover {
+    border-color: #8c42f5;
+    box-shadow: 0 0 15px rgba(140, 66, 245, 0.4);
+}
+
+/* Button styles */
+.btn-primary {
+    background-color: #6a0dad;
+    border-color: #6a0dad;
+}
+
+.btn-primary:hover {
+    background-color: #8c42f5;
+    border-color: #8c42f5;
+}
+
+/* Footer styles */
+.footer {
+    margin-top: 3rem;
+    padding: 1rem 0;
+    border-top: 1px solid var(--card-border);
+    text-align: center;
+    color: var(--subtitle-color);
+}
+
+/* Video control styles */
+.video-unified-controls {
+    padding: 10px;
+    border-radius: 8px;
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
+    transition: all 0.2s;
+}
+
+.video-unified-controls:hover {
+    border-color: #8c42f5;
+}
+
+.time-display {
+    font-family: monospace;
+    font-size: 1rem;
+}
+
+/* Button active feedback for improved UX */
+.btn-active-feedback {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 3px rgba(140, 66, 245, 0.5);
+    transition: transform 0.1s, box-shadow 0.1s;
+}
+
+/* Make buttons more clickable */
+.video-unified-controls .btn {
+    min-height: 32px;
+    min-width: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.1s ease;
+}
+
+.video-unified-controls .btn:active {
+    transform: scale(0.95);
+}
+
+/* Fullscreen mode styles */
+.card-body.fullscreen-mode {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    padding: 1rem;
+    box-sizing: border-box;
+    background-color: var(--bg-color);
+}
+
+.card-body.fullscreen-mode .row {
+    width: 100%;
+    margin: 0;
+    flex-grow: 1;
+}
+
+.card-body.fullscreen-mode video {
+    max-height: calc(100vh - 80px);
+    width: 100%;
+    object-fit: contain;
+}
+
+.card-body.fullscreen-mode .video-controls-container {
+    position: fixed;
+    bottom: 10px;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    margin: 0;
+}
+
+/* Make controls more visible in fullscreen */
+.card-body.fullscreen-mode .video-unified-controls {
+    background-color: rgba(42, 42, 42, 0.85);
+    backdrop-filter: blur(4px);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    padding: 15px;
+}
+
+/* Hide timeline title text when in fullscreen (all screen sizes) */
+.card-body.fullscreen-mode .timeline-title {
+    display: none !important;
+}
+
+/* Exit fullscreen button */
+.exit-fullscreen-btn {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 10000;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+
+.exit-fullscreen-btn:hover {
+    background-color: rgba(107, 13, 173, 0.8);
+}
+
+/* Add a fullscreen button inside the controls for exiting */
+.fullscreen-exit-control {
+    margin-left: 5px;
+    display: none;
+}
+
+.card-body.fullscreen-mode .fullscreen-exit-control {
+    display: inline-block;
+}
+
+@media (max-width: 768px) {
+    .video-unified-controls {
+        flex-direction: column;
+    }
+    
+    .card-body.fullscreen-mode .video-unified-controls {
+        padding: 8px;
+        font-size: 12px;
+    }
+
+    .card-body.fullscreen-mode .video-unified-controls button,
+    .card-body.fullscreen-mode .video-unified-controls .btn {
+        padding: 4px 8px;
+        font-size: 11px;
+    }
+
+    .card-body.fullscreen-mode .timeline-title {
+        display: none;
+    }
+}
+
+/* Fire/Smoke Detection Alarm Styles */
+.fire-alarm {
+    outline: 4px solid #ff0000 !important;
+    outline-offset: 0px !important;
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.8), 
+                0 0 40px rgba(255, 0, 0, 0.6), 
+                inset 0 0 20px rgba(255, 0, 0, 0.2) !important;
+    animation: fireAlarmPulse 1.5s ease-in-out infinite alternate;
+}
+
+.fire-alarm-strong {
+    outline: 6px solid #ff0000 !important;
+    outline-offset: 0px !important;
+    box-shadow: 0 0 30px rgba(255, 0, 0, 0.9), 
+                0 0 60px rgba(255, 0, 0, 0.7), 
+                inset 0 0 30px rgba(255, 0, 0, 0.3) !important;
+    animation: fireAlarmPulseStrong 1s ease-in-out infinite alternate;
+}
+
+/* Position video labels above videos during fullscreen */
+.card-body.fullscreen-mode .col-md-6 {
+    position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.card-body.fullscreen-mode .col-md-6 h5 {
+    position: relative !important;
+    margin: 0 0 10px 0 !important;
+    padding: 5px 0 !important;
+    font-size: 1rem !important;
+    color: var(--text-color) !important;
+    text-align: left !important;
+}
+
+/* Keyframe animations for alarm effects */
+@keyframes fireAlarmPulse {
+    0% {
+        border-color: #ff0000;
+        box-shadow: 0 0 20px rgba(255, 0, 0, 0.8), 
+                    0 0 40px rgba(255, 0, 0, 0.6), 
+                    inset 0 0 20px rgba(255, 0, 0, 0.2);
+    }
+    100% {
+        border-color: #ff6666;
+        box-shadow: 0 0 30px rgba(255, 0, 0, 1), 
+                    0 0 60px rgba(255, 0, 0, 0.8), 
+                    inset 0 0 30px rgba(255, 0, 0, 0.4);
+    }
+}
+
+@keyframes fireAlarmPulseStrong {
+    0% {
+        border-color: #ff0000;
+        box-shadow: 0 0 30px rgba(255, 0, 0, 0.9), 
+                    0 0 60px rgba(255, 0, 0, 0.7), 
+                    inset 0 0 30px rgba(255, 0, 0, 0.3);
+    }
+    100% {
+        border-color: #ff3333;
+        box-shadow: 0 0 40px rgba(255, 0, 0, 1), 
+                    0 0 80px rgba(255, 0, 0, 0.9), 
+                    inset 0 0 40px rgba(255, 0, 0, 0.5);
+    }
+}
+
+/* Add this to ensure the navbar toggler (hamburger) is white in dark mode */
+.navbar-toggler {
+    border-color: #fff;
+}
+
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255,255,255,1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+}
+
+[data-theme="light"] .navbar-toggler {
+    border-color: var(--nav-text-color);
+}
+[data-theme="light"] .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(33,37,41,1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+}
