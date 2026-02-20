@@ -4,8 +4,7 @@
 
 **Master's Thesis Project — Instituto Superior Técnico (IST), Universidade de Lisboa**
 
-[![GitHub](https://img.shields.io/badge/GitHub-FilipeTendeiro%2FFireTools-181717?logo=github)](https://github.com/FilipeTendeiro/FireTools)
-[![Website](https://img.shields.io/badge/Website-filipetendeiro.github.io%2FFireTools-ff6b35)](https://filipetendeiro.github.io/FireTools/)
+[![Project Page](https://img.shields.io/badge/Website-filipetendeiro.github.io%2FFireTools-ff6b35)](https://filipetendeiro.github.io/FireTools/)
 
 </div>
 
@@ -17,7 +16,7 @@
 <sup>2</sup> Portuguese Military Research Center (CINAMIL), Portuguese Military Academy, Rua Gomes Freire, 1169-203 Lisbon, Portugal  
 <sup>3</sup> Portuguese Navy Research Center (CINAV), Portuguese Naval Academy, Base Naval de Lisboa, Alfeite, 2810-001 Almada, Portugal  
 
-\* Corresponding author · [filipetendeiro@tecnico.ulisboa.pt](mailto:filipetendeiro@tecnico.ulisboa.pt)  
+\* Corresponding author · [filipetendeiro@proton.me](mailto:filipetendeiro@proton.me)  
 Contributing: [nuno.pessanha.santos@tecnico.ulisboa.pt](mailto:nuno.pessanha.santos@tecnico.ulisboa.pt), [alexandre.bernardino@tecnico.ulisboa.pt](mailto:alexandre.bernardino@tecnico.ulisboa.pt)
 
 <div align="center">
