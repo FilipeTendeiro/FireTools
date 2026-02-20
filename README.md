@@ -9,7 +9,7 @@
 </div>
 
 <div align="center">
-  <video src="images/FireTools.mp4" controls width="90%" style="max-width:900px; border-radius:12px;">FireTools system overview</video>
+  <video src="https://raw.githubusercontent.com/FilipeTendeiro/FireTools/main/images/FireTools.mp4" controls width="90%" style="max-width:900px; border-radius:12px;">FireTools system overview</video>
 </div>
 
 ---
