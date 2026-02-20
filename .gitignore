@@ -1,0 +1,90 @@
+# Large directories and files
+FireTools_Linux/outputs/
+FireTools_Linux/uploads/
+FireTools_Windows/outputs/
+FireTools_Windows/uploads/
+teses_cursor/
+
+# Model weights and checkpoints
+*.ckpt
+*.h5
+*.pkl
+
+# Large media files (README/thesis images in images/ are allowed)
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.m4v
+*.jpg
+*.jpeg
+*.png
+*.tiff
+*.tif
+*.bmp
+*.gif
+*.ts
+# Allow images folder for README and thesis figures
+!images/
+!images/*.png
+!images/*.jpg
+!images/*.jpeg
+*.json
+*.csv
+*.xlsx
+*.xls
+*.docx
+*.doc
+*.MP4
+*.AVI
+*.MOV
+*.MKV
+*.M4V
+*.JPG
+*.JPEG
+*.PNG
+*.TIFF
+*.TIF
+*.BMP
+*.GIF
+*.TS
+
+# Python virtual environments
+venv/
+env/
+.venv/
+.env/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Jupyter notebooks checkpoints
+.ipynb_checkpoints/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+# large data
+Metadata/Working/
+*.MP4
+*.mp4
+*.bin
+Metadata/**/parsed_telemetry.json

@@ -8,17 +8,6 @@
 
 </div>
 
-### Authors
-
-**Filipe Martins Tendeiro**\*<sup>1</sup>, **Nuno Pessanha Santos**<sup>1,2,3</sup>, **Alexandre Bernardino**<sup>1</sup>
-
-<sup>1</sup> Institute for Systems and Robotics (ISR), Instituto Superior Técnico (IST), Av. Rovisco Pais 1, 1049-001 Lisbon, Portugal  
-<sup>2</sup> Portuguese Military Research Center (CINAMIL), Portuguese Military Academy, Rua Gomes Freire, 1169-203 Lisbon, Portugal  
-<sup>3</sup> Portuguese Navy Research Center (CINAV), Portuguese Naval Academy, Base Naval de Lisboa, Alfeite, 2810-001 Almada, Portugal  
-
-\* Corresponding author · [filipetendeiro@proton.me](mailto:filipetendeiro@proton.me)  
-Contributing: [nuno.pessanha.santos@tecnico.ulisboa.pt](mailto:nuno.pessanha.santos@tecnico.ulisboa.pt), [alexandre.bernardino@tecnico.ulisboa.pt](mailto:alexandre.bernardino@tecnico.ulisboa.pt)
-
 <div align="center">
   <img src="images/FireTools_overview.png" width="90%" alt="FireTools system overview">
 </div>
