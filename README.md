@@ -2,7 +2,10 @@
 
 <div align="center">
 
-**Master's Thesis Project — Instituto Superior Técnico (IST), Universidade de Lisboa**  
+**Master's Thesis Project — Instituto Superior Técnico (IST), Universidade de Lisboa**
+
+[![GitHub](https://img.shields.io/badge/GitHub-FilipeTendeiro%2FFireTools-181717?logo=github)](https://github.com/FilipeTendeiro/FireTools)
+[![Website](https://img.shields.io/badge/Website-filipetendeiro.github.io%2FFireTools-ff6b35)](https://filipetendeiro.github.io/FireTools/)
 
 </div>
 
@@ -105,8 +108,8 @@ winget install --id Python.Python.3.11 -e
 winget install --id Gyan.FFmpeg -e
 
 # 2. Clone and enter folder
-git clone <repository-url>
-cd FireTools_Windows
+git clone https://github.com/FilipeTendeiro/FireTools.git
+cd FireTools/FireTools_Windows
 
 # 3. Create virtual environment
 py -3.11 -m venv .venv
@@ -132,8 +135,8 @@ For the full step-by-step guide see **[FireTools_Windows/SETUP_WINDOWS.md](FireT
 sudo apt-get update && sudo apt-get install python3 python3-pip python3-venv ffmpeg
 
 # 2. Clone and enter folder
-git clone <repository-url>
-cd FireTools_Linux
+git clone https://github.com/FilipeTendeiro/FireTools.git
+cd FireTools/FireTools_Linux
 
 # 3. Create virtual environment
 python3 -m venv .venv
@@ -267,4 +270,10 @@ Issues and pull requests are welcome. Please open an issue before submitting sub
 - **Nuno Pessanha Santos**: [nuno.pessanha.santos@tecnico.ulisboa.pt](mailto:nuno.pessanha.santos@tecnico.ulisboa.pt)
 - **Alexandre Bernardino**: [alexandre.bernardino@tecnico.ulisboa.pt](mailto:alexandre.bernardino@tecnico.ulisboa.pt)
 
-Or open a [GitHub issue](https://github.com/FilipeTendeiro/GitHub/issues).
+Or open a [GitHub issue](https://github.com/FilipeTendeiro/FireTools/issues).
+
+---
+
+## Project Website
+
+A full presentation of this project is available at **[filipetendeiro.github.io/FireTools](https://filipetendeiro.github.io/FireTools/)**.
