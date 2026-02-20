@@ -9,7 +9,7 @@
 </div>
 
 <div align="center">
-  <img src="images/FireTools_overview.png" width="90%" alt="FireTools system overview">
+  <video src="images/FireTools.mp4" controls width="90%" style="max-width:900px; border-radius:12px;">FireTools system overview</video>
 </div>
 
 ---

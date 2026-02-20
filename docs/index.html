@@ -146,7 +146,7 @@
     .stat { text-align: center; }
     .stat-value { font-size: 1.8rem; font-weight: 800; color: var(--accent); }
     .stat-label { font-size: .8rem; color: var(--text-muted); margin-top: 2px; }
-    .hero-image { margin-top: 3.5rem; max-width: 900px; width: 100%; border-radius: var(--radius); box-shadow: var(--shadow), var(--shadow-glow); }
+    .hero-image { margin-top: 3.5rem; max-width: 900px; width: 100%; border-radius: var(--radius); box-shadow: var(--shadow), var(--shadow-glow); display: block; }
 
     /* ===== SECTIONS ===== */
     section { padding: 80px 2rem; }
@@ -313,6 +313,7 @@
     .perf-section { display: none; }
     .perf-section.active { display: block; }
     .perf-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 2rem; align-items: start; }
+    .perf-grid.perf-grid-single { grid-template-columns: 1fr; }
     .perf-text p { color: var(--text-muted); font-size: .93rem; margin-bottom: .8rem; }
     .result-table { width: 100%; border-collapse: collapse; font-size: .88rem; margin-top: 1rem; }
     .result-table th {
@@ -511,7 +512,7 @@
     <div class="stat"><div class="stat-value">98.7%</div><div class="stat-label">Success Rate</div></div>
     <div class="stat"><div class="stat-value">87%</div><div class="stat-label">Review Time Saved</div></div>
   </div>
-  <img class="hero-image" src="images/FireTools_overview.png" alt="FireTools system overview" />
+  <video class="hero-image" src="images/FireTools.mp4" controls loop muted playsinline aria-label="FireTools system overview"></video>
 </section>
 
 <!-- ============================  ABOUT  ============================ -->
@@ -743,7 +744,7 @@
     </div>
 
     <div id="perf-det" class="perf-section active">
-      <div class="perf-grid">
+      <div class="perf-grid perf-grid-single">
         <div class="perf-text">
           <h3>YOLOv8n vs Faster R-CNN</h3>
           <p>YOLOv8n runs at <strong>82.7 FPS</strong> and outperforms Faster R-CNN on F1-score (0.603 vs 0.287). Faster R-CNN has higher mAP but around 80% false positives, which limits practical use in the field.</p>

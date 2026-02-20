@@ -24,11 +24,17 @@ teses_cursor/
 *.bmp
 *.gif
 *.ts
-# Allow images folder for README and thesis figures
+# Allow images folder for README and thesis figures (including video)
 !images/
 !images/*.png
 !images/*.jpg
 !images/*.jpeg
+!images/*.mp4
+!docs/images/
+!docs/images/*.png
+!docs/images/*.jpg
+!docs/images/*.jpeg
+!docs/images/*.mp4
 *.json
 *.csv
 *.xlsx
@@ -88,3 +94,7 @@ Metadata/Working/
 *.mp4
 *.bin
 Metadata/**/parsed_telemetry.json
+
+# Allow FireTools.mp4 in repo for README and GitHub Pages
+!images/FireTools.mp4
+!docs/images/FireTools.mp4
