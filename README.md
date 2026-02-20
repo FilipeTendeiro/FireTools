@@ -6,9 +6,9 @@
 
 <div align="center">
 
-[![Project Website](https://img.shields.io/badge/Project_website-8c42f5?style=for-the-badge)](https://filipetendeiro.github.io/FireTools/)
+[![Visit website](https://img.shields.io/badge/🔥_Visit-Project_website-8c42f5?style=for-the-badge)](https://filipetendeiro.github.io/FireTools/)
 
-<img src="images/FireTools_overview.png" width="90%" alt="FireTools system overview">
+<img src="images/FireTools_overview.png" width="90%" alt="FireTools system overview">  
 
 </div>
 
